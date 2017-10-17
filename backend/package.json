@@ -1,0 +1,22 @@
+{
+  "name": "mystore",
+  "version": "1.0.0",
+  "description": "Beacons nodejs, expressjs, heroku and pubnub.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gdmgent-1718-wot/week4-beacons.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gdmgent-1718-wot/week4-beacons/issues"
+  },
+  "homepage": "https://github.com/gdmgent-1718-wot/week4-beacons#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
