@@ -42,6 +42,26 @@ function publish(){
     });   
 }
 
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/myStore";
+
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    var newArrivals = [{ brand: "nike", color: "red", size: "s, m"}, { brand: "nike", color: "blue", size: "s, m"}]
+    db.createCollection("tshirts", function(err, res){
+        if (err) throw err;
+        db.collection("tshirts").insertMany(newArrivals, function(err, res){
+            if (err) throw err;
+            db.close();
+        });
+    });
+    db.collection("tshirts").find({}).toArray(function(err, result){
+        if(err)throw err;
+        console.log(result);
+        db.close();
+    })
+  });
+  
 app.get('/', function (req, res){
     res.sendFile(path + "index.html");
 })
