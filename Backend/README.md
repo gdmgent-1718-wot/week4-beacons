@@ -8,7 +8,19 @@ Mongodb is een database die data opslaat als flexibele json documenten. Dit wil 
 flexiebel systeem is. 
 
 **Automatisatie** 
+
 Als je niet steeds na elke aanpassing je server wil herstarten dan kan je best gebruik maken van nodemon
 ```
 npm install nodemon --save-dev
 ```
+Vervolgens voeg onderstaand stukje code toe aan de package.json. Dit gaat het commando om de server te starten vereenvoudigen. 
+```json
+{
+  // ...
+  "scripts": {
+    "dev": "nodemon server.js"
+  }
+  // ...
+}
+```
+Start de server met ```npm run dev```
