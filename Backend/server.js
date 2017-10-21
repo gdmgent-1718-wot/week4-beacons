@@ -7,7 +7,7 @@ const pubnub = new PubNub({
     subscribeKey : 'sub-c-e9f3f922-b32d-11e7-a852-92b7c98bd364'
 });
 var db; var db_name = 'promotions';
-path = __dirname + '/views/';
+
 // Setup the database
 MongoClient.connect('mongodb://localhost:27017/' + db_name, (err, database) => {
     if (err) return console.log(err);
@@ -19,37 +19,61 @@ MongoClient.connect('mongodb://localhost:27017/' + db_name, (err, database) => {
     });
 })
 
-// Get request
-app.get('/', (req, res) => {
-    var collections = ['shoes', 'toys', 'cosmetics', 'undies'];
-    db.collection('shoes').find().toArray(function(err, results) {
-        console.log(results);
-        res.sendFile(path + 'index.html'); // Show the index.html page listed in the views folder. 
+app.get('/promotions/:channel', (req, res) => {
+    var channel = req.params.channel;
+    var message = [];
+    db.collection(channel).find({}).toArray((err, result) => {
+        if (err) console.log(err);
+        console.log(result); 
+        message = result;
+        publish(channel, message);
     });
-   
-})
-app.get('/:channel', (req, res) => {
-    publish(req.params.channel);
 });
 
 app.get('/populate_the_database', (req, res) => {
-    var collections = ['shoes', 'toys', 'cosmetics', 'undies'];
-    var promotions = {'nike': "-30%"};
-    collections.forEach(function(item) {
-        db.collection(item).save(promotions, (err, result)=> {
+    /**
+     * Promotion structure:
+     * 
+        {
+            "brand": "string",
+            "precentage": "integer",
+            "product": "string", 
+            "ends": "date"
+        }
+     */
+    var shoes = [{
+            "brand": "Nike",
+            "precentage": "10",
+            "product": "Sneakers revolution 3", 
+            "ends": "20.11.2017"
+        }, {
+            "brand": "Mustang",
+            "precentage": "30",
+            "product": "Cotton sneakers", 
+            "ends": "10.11.2017"
+        }, 
+    ];
+    shoes.forEach(function(shoe) {
+        db.collection('shoes').save(shoe, (err, result)=> {
             if(err) return console.log(err);
-      
-            console.log('Saved '+ item + ' to database');
-        });
+             console.log('Saved shoes to database');
+         });
     }, this);
+
 });
 
-function publish(chl){
-    console.log("publish");
+app.get('/delete/:collection', (req, res) => {
+    var collection = req.params.collection;
+    db.collection(collection).drop(function(err, delOK) {
+        if (err) throw err;
+        if (delOK) console.log("Deleted: " + collection);
+      });
+})
+function publish(chl, promotions){
 
     var publishConfig = {
         channel : chl,
-        message : "My winning power"
+        message : promotions // ALL FOUND PROMOTIONS FOR ONE CHANNEL
     }
     pubnub.addListener({
         status: function(statusEvent) {
@@ -60,16 +84,14 @@ function publish(chl){
                 })
             }
         },
+        // RETURN THE RESÙTLS TO THE CHANNEL AKA SEND TO IONIC APP
         message: function(message) {
-            db.collection(chl).find().toArray(function(err, results) {
-                console.log(results);
-            });
+            console.log("MESSAGE", message["message"]);
         },
         presence: function(presenceEvent) {
             console.log("PRESENCE", presenceEvent);
         }
     })
-    
     subscibe(chl);
 }
 
