@@ -22,4 +22,5 @@ Vervolgens voeg onderstaand stukje code toe aan de package.json. Dit gaat het co
 ```
 Start de server met ```npm run dev```
 
-#### database 
+#### Pubnub
+Pubnub zorgt voor realtime datatransfer. Dit doet die doormiddel van een subscribe / publish systeem. 
