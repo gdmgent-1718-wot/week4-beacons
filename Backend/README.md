@@ -87,17 +87,22 @@ Vervolgens maken we enkele objectjes om onze database te vullen. Bijvoorbeeld:
 ```
 Nu we onze objectjes hebben willen we ze toevoegen aan de database. Met een kleine foreach loop lopen we doorheen het object. Iets opslaan doen we met het volgende stukje code. 
 ```
-    db.collection('shoes').save(shoe, (err, result)=> {
-        if(err) return console.log(err);
-        console.log('Saved shoes to database');
-    });
+    shoes.forEach(function(shoe) {
+        db.collection('shoes').save(shoe, (err, result) => {
+            if(err) return console.log(err);
+            console.log('Saved shoes to database');
+         });
+    }, this);
 ```
 Mochten er fouten zijn gemaakt kan je op een heel eenvoudige manier de collecties droppen. 
 ```
-   db.collection(myCollection).drop(function(err, delOK) {
-        if (err) console.loge(err);
-        if (delOK) console.log("Deleted: " + collection);
-      });
+    app.get('/delete/:collection', (req, res) => {
+        var collection = req.params.collection;
+        db.collection(collection).drop(function(err, delOK) {
+            if (err) console.loge(err);
+            if (delOK) console.log("Deleted: " + collection);
+        });
+    });
 ```
 **Pubishing data:** Voor we kunnen subscriben moeten we data ophalen uit onze database. We luisteren naar een url die wordt opgevraagd. In dit geval /promotions/:channel. ":channel" is een variabele.
 deze kunnen we ophalen met ```req.params.channel;```. We halen de data op met de volgende lijn code. 
@@ -105,8 +110,17 @@ deze kunnen we ophalen met ```req.params.channel;```. We halen de data op met de
 db.collection(channel).find({}).toArray((err, result) => {
         if (err) console.log(err);
         message = result;
-        publish(channel, message);
 });
 ```
 
-Zodra de data is gevonden willen we naar het gevraagde channel publishen.
+Zodra de data is gevonden willen we naar het gevraagde channel publishen. Pubnub komt standaard met een pubish functie hier kan je vele opties aan mee geven. Wij beperken het tot message en channel. 
+```
+    pubnub.publish(
+        {
+            message: {
+                such: message
+            },
+            channel: channel
+        }
+    );
+```

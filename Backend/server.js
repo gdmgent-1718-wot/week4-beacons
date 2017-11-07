@@ -26,7 +26,15 @@ app.get('/promotions/:channel', (req, res) => {
     db.collection(channel).find({}).toArray((err, result) => {
         if (err) console.log(err);
         message = result;
-        publish(channel, message);
+        pubnub.publish(
+            {
+                message: {
+                    message: message,
+                    
+                },
+                channel: channel,
+            }
+        );
     }); 
 });
 
@@ -87,32 +95,3 @@ app.get('/delete/:collection', (req, res) => {
         if (delOK) console.log("Deleted: " + collection);
       });
 });
-function publish(chl, promotions){
-
-    var publishConfig = {
-        channel : chl,
-        message : promotions // ALL FOUND PROMOTIONS FOR ONE CHANNEL
-    }
-
-    pubnub.addListener({
-        status: function(statusEvent) {
-            if (statusEvent.category === "PNConnectedCategory") {
-                pubnub.publish(publishConfig, function(status, response) {
-                    console.log(status, response);
-                })
-            }
-        },
-        // RETURN THE RESÙTLS TO THE CHANNEL 
-        message: function(message) {
-            console.log(message['message']);
-            promo = message['message'];
-        }
-    })
-    subscibe(chl);
-}
-
-function subscibe(chl){
-    pubnub.subscribe({
-        channels: [chl] 
-    });
-}
