@@ -52,9 +52,9 @@ Importeer de mongodb met de volgende regel code ```const MongoClient = require('
 Wanneer we de server draaien gaan we luisteren naar een specifieke poort. 
 ```
     app.listen(3000, function(){ 
-        console.log('listening on http://localhost:3000/');
+            console.log('listening on http://localhost:3000/');
+        });
     });
-})
 ```
 **Database aanmaken:** Om een database aan te maken moeten we connecteren met de mongo client. Als de connectie faalt zal er de error worden gelogd in de console. We willen dat de database connectie actief is wanneer we onze server draaien. 
 ```
@@ -107,10 +107,10 @@ Mochten er fouten zijn gemaakt kan je op een heel eenvoudige manier de collectie
 **Pubishing data:** Voor we kunnen subscriben moeten we data ophalen uit onze database. We luisteren naar een url die wordt opgevraagd. In dit geval /promotions/:channel. ":channel" is een variabele.
 deze kunnen we ophalen met ```req.params.channel;```. We halen de data op met de volgende lijn code. 
 ```
-db.collection(channel).find({}).toArray((err, result) => {
-        if (err) console.log(err);
-        message = result;
-});
+    db.collection(channel).find({}).toArray((err, result) => {
+            if (err) console.log(err);
+            message = result;
+    });
 ```
 
 Zodra de data is gevonden willen we naar het gevraagde channel publishen. Pubnub komt standaard met een pubish functie hier kan je vele opties aan mee geven. Wij beperken het tot message en channel. 
