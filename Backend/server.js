@@ -8,41 +8,28 @@ const pubnub = new PubNub({
 });
 var db; var db_name = 'promotions';
 var promo = []; 
-app.set('views', __dirname + '/views');
-app.set('view engine', 'pug');
 
-// Setup the database
-MongoClient.connect('mongodb://localhost:27017/' + db_name, (err, database) => {
-    if (err) return console.log(err);
-    db = database;
-    console.log(db['s']['databaseName']);
-    // Create a server where browsers can connect to. 
-    app.listen(3000, function(){ 
-        console.log('listening on http://localhost:3000/');
-    });
-})
 
-app.get('/', (req, res) => {
-    res.render('index', { title: 'Hey', message: 'Hello there!' });
- });
- 
+// Create a server where browsers can connect to. 
+app.listen(3000, function(){ 
+    // Setup the database
+    MongoClient.connect('mongodb://localhost:27017/' + db_name, (err, database) => {
+        if (err) return console.log(err);
+        db = database;
+    })
+    console.log('listening on http://localhost:3000/');
+});
+
 app.get('/promotions/:channel', (req, res) => {
     var channel = req.params.channel;
-    var message = [];  
+    var message = []; 
     db.collection(channel).find({}).toArray((err, result) => {
         if (err) console.log(err);
         message = result;
         publish(channel, message);
-        res.render("product", { title: 'promo', message: promo, channel: channel });
     }); 
 });
-app.get('/toy', (req, res) => {
-    db.collection("toys").find({}).toArray(function(err, result) {
-      if (err) console.log(err);
-      console.log(result);
-      db.close();
-    });
-})
+
 app.get('/populate_the_database', (req, res) => {
     /**
      * Promotion structure:
@@ -101,11 +88,12 @@ app.get('/delete/:collection', (req, res) => {
       });
 });
 function publish(chl, promotions){
-    
+
     var publishConfig = {
         channel : chl,
         message : promotions // ALL FOUND PROMOTIONS FOR ONE CHANNEL
     }
+
     pubnub.addListener({
         status: function(statusEvent) {
             if (statusEvent.category === "PNConnectedCategory") {
@@ -124,7 +112,6 @@ function publish(chl, promotions){
 }
 
 function subscibe(chl){
-    console.log("Subscribing...");
     pubnub.subscribe({
         channels: [chl] 
     });
