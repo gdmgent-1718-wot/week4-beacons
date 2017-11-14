@@ -9,7 +9,7 @@ const pubnub = new PubNub({
 var db; var db_name = 'promotions';
 var promo = []; 
 
-
+var  channels = ['toys', 'shoes']; 
 // Create a server where browsers can connect to. 
 app.listen(3000, function(){ 
     // Setup the database
@@ -18,7 +18,43 @@ app.listen(3000, function(){
         db = database;
     })
     console.log('listening on http://localhost:3000/');
+   
+    pubnub.addListener({
+        message: function(m) {
+            var channelName = m.channel; // The channel for which the message belongs
+            console.log(channelName, m.message);
+            channels.forEach(c => {
+                if(c == channelName){
+                    test(channelName);
+                }
+            });     
+        }
+    });
+    pubnub.subscribe({
+        channels: channels,
+    });
 });
+
+function test (channel){
+    console.log(channel);
+    db.collection(channel).find({}).toArray((err, result) => {
+        if (err) console.log(err);
+        message = result;
+        pubnub.publish(
+            {
+                message: {
+                    message: message,
+                },
+                channel: channel,
+                storeInHistory: true, 
+            }
+        ); 
+        pubnub.unsubscribe({
+            channels: [channel]
+        })
+        console.log(message, channel);
+    });
+}
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -28,24 +64,14 @@ app.use(function(req, res, next) {
 
 app.get('/promotions/:channel', (req, res) => {
     var channel = req.params.channel;
-    var message = []; 
-
-    db.collection(channel).find({}).toArray((err, result) => {
-        if (err) console.log(err);
-        message = result;
-        pubnub.publish(
-            {
-                message: {
-                    message: message,
-                    
-                    
-                },
-                channel: channel,
-            }
-        ); 
-        console.log(message);
-    });
-    res.send(message); 
+    pubnub.publish(
+        {
+            message: {
+                message: ('test'),
+            },
+            channel: channel,
+        }
+    ); 
 });
 
 
