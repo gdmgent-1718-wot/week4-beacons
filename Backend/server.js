@@ -13,16 +13,23 @@ var promo = [];
 // Create a server where browsers can connect to. 
 app.listen(3000, function(){ 
     // Setup the database
-    MongoClient.connect('mongodb://localhost:27017/' + db_name, (err, database) => {
+    MongoClient.connect('mongodb://localhost:27013/' + db_name, (err, database) => {
         if (err) return console.log(err);
         db = database;
     })
     console.log('listening on http://localhost:3000/');
 });
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
 app.get('/promotions/:channel', (req, res) => {
     var channel = req.params.channel;
     var message = []; 
+
     db.collection(channel).find({}).toArray((err, result) => {
         if (err) console.log(err);
         message = result;
@@ -31,12 +38,16 @@ app.get('/promotions/:channel', (req, res) => {
                 message: {
                     message: message,
                     
+                    
                 },
                 channel: channel,
             }
-        );
-    }); 
+        ); 
+        console.log(message);
+    });
+    res.send(message); 
 });
+
 
 app.get('/populate_the_database', (req, res) => {
     /**
@@ -72,12 +83,18 @@ app.get('/populate_the_database', (req, res) => {
         "brand": "Jupiler League",
         "precentage": "40",
         "product": "ball", 
-        "ends": "20.01.2018"
+        "ends": "20.1.2018"
     }, {
         "brand": "Monk",
         "precentage": "30",
         "product": "doll", 
-        "ends": "1.11.2017"
+        "ends": "10.11.2017"
+    },
+    {
+        "brand": "Master ship",
+        "precentage": "40",
+        "product": "lego", 
+        "ends": "12.11.2017"
     }];
     toys.forEach(function(toy) {
         db.collection('toys').save(toy, (err, result)=> {

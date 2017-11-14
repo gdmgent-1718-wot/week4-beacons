@@ -1,24 +1,28 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Home</ion-title>
+    <ion-title>Home v13</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h2>Welcome to Ionic!</h2>
-  <div *ngFor="let m of message">
-    {{m.brand}}
-  </div>
+  <p>Message: {{ alert }}</p>
 
   <ion-buttons end>
-    <button ion-button (click)="scan()"> Scan </button>
+    <button ion-button full (click)="scan()"> Scan Nu</button>
   </ion-buttons>
-
   <ion-list> 
     <button ion-item *ngFor="let device of devices">
       <h2>{{ device.name || 'Unnamed' }}</h2>
       <p>{{ device.id }}</p>
       <p>RSSI: {{ device.rssi }}</p>
+    </button>  
+  </ion-list>
+  <ion-list> 
+    <button ion-item *ngFor="let m of message">
+      <h2>{{ m.product || 'Unnamed' }}</h2>
+      <p>brand {{ m.brand }}</p>
+      <p>discount {{m.precentage}} %</p>
+      <p>promotion ends at {{m.ends}}</p>
     </button>  
   </ion-list>
 
